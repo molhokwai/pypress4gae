@@ -1,0 +1,30 @@
+(dp1
+S'comment_text'
+p2
+S'TEXT'
+p3
+sS'post_id'
+p4
+S'REFERENCES posts(id) ON DELETE CASCADE'
+p5
+sS'comment_author'
+p6
+S'CHAR(32)'
+p7
+sS'comment_time'
+p8
+S'CHAR(32)'
+p9
+sS'comment_author_website'
+p10
+S'CHAR(32)'
+p11
+sS'id'
+p12
+S'INTEGER PRIMARY KEY AUTOINCREMENT'
+p13
+sS'comment_author_email'
+p14
+S'CHAR(32)'
+p15
+s.
