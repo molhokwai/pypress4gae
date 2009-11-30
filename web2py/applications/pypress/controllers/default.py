@@ -37,8 +37,7 @@ response.links = items
 # The main page
 # Shows the first 10 posts    
 def index():
-    #print db.tables
-    #print "start insert initialize data"
+
     """
     db.posts.insert(
                     post_title='Hello world!', 
@@ -52,10 +51,8 @@ def index():
                     post_category=1)
     """
     
-    posts=db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
-    #posts = db(db.posts.post_type == 'post').select(db.posts.ALL)
-    #for p in dict(posts = posts):
-       # print p
+    posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
+
     """
     for p in posts:
         print p
