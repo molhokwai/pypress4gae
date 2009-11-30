@@ -37,8 +37,35 @@ response.links = items
 # The main page
 # Shows the first 10 posts    
 def index():
-    posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
+    #print db.tables
+    #print "start insert initialize data"
+    """
+    db.posts.insert(
+                    post_title='Hello world!', 
+                    post_text='Welcome to PyPress. This is your first post. Edit or delete it, then start blogging!',
+                    post_type='post',
+                    post_category=1)
+    db.posts.insert(
+                    post_title='Welcome to PyPress', 
+                    post_text='This is the Python version of WordPress. Enjoy.',
+                    post_type='post',
+                    post_category=1)
+    """
+    
+    posts=db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
+    #posts = db(db.posts.post_type == 'post').select(db.posts.ALL)
+    #for p in dict(posts = posts):
+       # print p
+    """
+    for p in posts:
+        print p
+        
+    print len(posts)
+    """
+    #print posts
+    #print dict(postss = posts)
     return dict(posts = posts)
+    #return posts
 
 # The post page
 # Shows the entire post, the comments, and the comment form
