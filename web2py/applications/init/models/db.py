@@ -5,12 +5,12 @@ except:
     db=DAL("gae")
     session.connect(request,response,db=db )
     
-"""
+
 from gluon.contrib.login_methods.gae_google_account import GaeGoogleAccount
 from gluon.tools import Auth
 auth=Auth(globals(), db)
 auth.settings.login_form=GaeGoogleAccount()
-"""
+auth.define_tables()
 
 import datetime
 db.define_table('blog_info',
@@ -75,6 +75,7 @@ def database_init():
     """
     #print db().select(db.blog_info.ALL)
     if not db().select(db.blog_info.ALL):
+        db.auth_user.insert(email='admin',password='123456')
         db.blog_info.insert(
                         name='[web2py] PyPress',
                         description='Just another PyPress weblog',
