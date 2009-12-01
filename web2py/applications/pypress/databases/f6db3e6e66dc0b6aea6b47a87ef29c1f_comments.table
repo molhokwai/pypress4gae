@@ -3,17 +3,17 @@ S'comment_text'
 p2
 S'TEXT'
 p3
-sS'post_id'
+sS'comment_time'
 p4
-S'REFERENCES posts(id) ON DELETE CASCADE'
+S'CHAR(32)'
 p5
 sS'comment_author'
 p6
 S'CHAR(32)'
 p7
-sS'comment_time'
+sS'post_id'
 p8
-S'CHAR(32)'
+S'REFERENCES posts(id) ON DELETE CASCADE'
 p9
 sS'comment_author_website'
 p10

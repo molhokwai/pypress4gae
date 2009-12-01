@@ -39,16 +39,44 @@ response.links = items
 def index():
 
     """
+    
+    
+    db.categories.insert(
+                    category_name='uncategorized')
+    db.categories.insert(
+                    category_name='news')
+                    
+    cat=db(db.categories.category_name == 'news').select(db.categories.ALL)[0]
+    print cat
     db.posts.insert(
                     post_title='Hello world!', 
                     post_text='Welcome to PyPress. This is your first post. Edit or delete it, then start blogging!',
                     post_type='post',
-                    post_category=1)
+                    post_category=cat.id)
     db.posts.insert(
                     post_title='Welcome to PyPress', 
                     post_text='This is the Python version of WordPress. Enjoy.',
                     post_type='post',
-                    post_category=1)
+                    post_category=cat.id)
+                    
+    
+    
+    db.comments.insert(
+                    post_id=1,
+                    comment_author='Richard',
+                    comment_author_web='http://zrx550.cn',
+                    comment_author_email='zrx550@gmail.com',
+                    comment_text='This is the fisrt comment on this blog.')
+    
+    db.links.insert(
+                    link_title='web2py',
+                    link_url='http://web2py.com')
+    db.links.insert(
+                    link_title='WordPressClone',
+                    link_url='http://www.web2py.com/appliances/default/show/36')
+    db.links.insert(
+                    link_title='zrx550.cn',
+                    link_url='http://zrx550.cn')
     """
     
     posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
@@ -59,6 +87,7 @@ def index():
         
     print len(posts)
     """
+    
     #print posts
     #print dict(postss = posts)
     return dict(posts = posts)
