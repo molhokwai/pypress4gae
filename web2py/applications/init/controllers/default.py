@@ -1,9 +1,17 @@
 #from gluon.fileutils import check_credentials
 #session.authorized=check_credentials(request)
 
-response.title = "PyPress - a web2py powered weblog"
-response.keywords = "web2py, Gluon, Python, Enterprise, Web, Framework, PyPress"
-response.description = "Just another PyPress weblog"
+blog_info = db().select(db.blog_info.ALL)
+#print "!"
+#print blog_info
+bloginfo=blog_info[0]
+#print "?"
+#print bloginfo.name
+#print db().select(db.blog_info.ALL)
+response.name = bloginfo.name if bloginfo else "[web2py<sup style='font-size:0.5em;'>TM</sup>] PyPress"
+response.title = bloginfo.title if bloginfo else "PyPress - a web2py powered weblog"
+response.keywords = bloginfo.keywords if bloginfo else "web2py, Gluon, Python, Enterprise, Web, Framework, PyPress"
+response.description = bloginfo.description if bloginfo else "Just another PyPress weblog"
 
 # This dynamically adds the pages to the menu
 pages = db(db.posts.post_type == 'page').select(db.posts.ALL)
@@ -37,57 +45,6 @@ response.links = items
 # The main page
 # Shows the first 10 posts    
 def index():
-
-    """
-    db.categories.insert(
-                    category_name='uncategorized')
-    db.categories.insert(
-                    category_name='news')
-                    
-    cats=db().select(db.categories.ALL)
-    #print cats
-    db.posts.insert(
-                    post_title='Hello world!', 
-                    post_text='Welcome to PyPress. This is your first post. Edit or delete it, then start blogging!',
-                    post_type='post',
-                    post_category=cats[0].id)
-    db.posts.insert(
-                    post_title='Welcome to PyPress', 
-                    post_text='This is the Python version of WordPress. Enjoy.',
-                    post_type='post',
-                    post_category=cats[1].id)
-    
-    posts=db().select(db.posts.ALL)
-    
-    db.comments.insert(
-                    post_id=posts[0].id,
-                    comment_author='Richard',
-                    comment_author_email='zrx550@gmail.com',
-                    comment_text='Another comment')
-    db.comments.insert(
-                    post_id=posts[0].id,
-                    comment_author='Mr PyPress',
-                    comment_author_email='zrx550@gmail.com',
-                    comment_text='Another comment')
-    db.comments.insert(
-                    post_id=posts[1].id,
-                    comment_author='Richard',
-                    comment_author_web='http://www.google.com',
-                    comment_author_email='zrx550@gmail.com',
-                    comment_text='This is a comment')
-    
-    db.links.insert(
-                    link_title='web2py',
-                    link_url='http://www.web2py.com')
-    db.links.insert(
-                    link_title='WordPressClone',
-                    link_url='http://www.web2py.com/appliances/default/show/36')
-    db.links.insert(
-                    link_title='zrx550.cn',
-                    link_url='http://zrx550.cn')
-    
-    """
-    #print db.tables
     posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
 
     return dict(posts = posts)
