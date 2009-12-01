@@ -4,6 +4,13 @@ try:
 except:
     db=DAL("gae")
     session.connect(request,response,db=db )
+    
+"""
+from gluon.contrib.login_methods.gae_google_account import GaeGoogleAccount
+from gluon.tools import Auth
+auth=Auth(globals(), db)
+auth.settings.login_form=GaeGoogleAccount()
+"""
 
 import datetime
 db.define_table('blog_info',

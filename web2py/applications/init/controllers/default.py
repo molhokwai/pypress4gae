@@ -45,8 +45,8 @@ response.links = items
 # The main page
 # Shows the first 10 posts    
 def index():
-    posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time)
-
+    posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time|~db.posts.post_title)
+    #posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=db.posts.post_time)
     return dict(posts = posts)
 
 # The post page
@@ -263,3 +263,38 @@ def manage():
     
     else:
         redirect(URL(r = request,f = 'index'))
+        
+def auth():
+    #from gluon.fileutils import check_credentials
+    #session.authorized=check_credentials(request)
+    
+    #from gluon.contrib.login_methods.gae_google_account import GaeGoogleAccount
+    #auth.settings.login_form=GaeGoogleAccount()
+    try : action = request.args[0]
+    except: redirect(URL(r = request, f = 'index'))
+    #print action
+    
+    
+    if action == 'login':
+        #print "login"
+        from gluon.contrib.login_methods.gae_google_account import GaeGoogleAccount
+        from gluon.tools import Auth
+        auth=Auth(globals(), db)
+        auth.settings.login_form=GaeGoogleAccount()
+        #print auth.settings.login_form
+    elif action == 'logout':
+        print "logout"
+    #area = request.args[0]
+    """
+    try:
+        action = request.args[0]
+        posts = db(
+                   (db.posts.post_type == 'post') &
+                   (db.posts.post_category == db.categories.id) &
+                   (db.categories.category_name == cat_name)
+                   ).select(db.posts.ALL, orderby=~db.posts.post_time)
+        response.sidebar_note = "You are currently browsing the archives for the %s category." % cat_name
+        return dict(posts = posts)
+    except:
+        redirect(URL(r = request,f = 'index'))
+    """
