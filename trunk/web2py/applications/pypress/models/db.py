@@ -5,6 +5,7 @@ try:
 except:
     db=DAL("gae")
     session.connect(request,response,db=db )
+#print db.tables
 
 import datetime
 
