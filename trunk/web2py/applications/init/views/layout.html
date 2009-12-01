@@ -125,8 +125,16 @@
 								<li><a href="/{{=request.application}}/default/add/post">Add Post</a></li>
 								<li><a href="/{{=request.application}}/default/add/category">Add Category</a></li>
 								<li><a href="/{{=request.application}}/default/add/link">Add Link</a></li>
+                                <li><a href="/{{=request.application}}/default/auth/logout">Log out</a></li>
 							</ul>
 						</li>
+					{{else:}}
+                        <li>
+                            <h2>Meta</h2>
+                            <ul>
+                                <li><a href="/{{=request.application}}/default/auth/login">Log in</a></li>
+                            </ul>
+                        </li>
 					{{pass}}
 				</ul>
             </div>

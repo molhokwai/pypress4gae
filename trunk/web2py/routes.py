@@ -10,9 +10,9 @@
 #   routes_in=( ('/static/(?P<file>[\w\./_-]+)','/init/static/\g<file>') )
 #
 
-routes_in = (#('.*/','/pypress/'),
-	    ('.*:/favicon.ico', '/examples/static/favicon.ico'),
-             ('.*:/robots.txt', '/examples/static/robots.txt'))
+routes_in = (#('.*/','/init/'),
+	         ('.*:/favicon.ico', '/init/static/favicon.ico'),
+             ('.*:/robots.txt', '/init/static/robots.txt'))
 
 # routes_out, like routes_in translates URL paths created with the web2py URL()
 # function in the same manner that route_in translates inbound URL paths.
