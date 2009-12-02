@@ -3,10 +3,10 @@
 
 bloginfo = db().select(db.blog_info.ALL)[0]
 
-response.name = bloginfo.name if bloginfo else "[web2py] PyPress"
-response.title = bloginfo.title if bloginfo else "PyPress - a web2py powered weblog"
-response.keywords = bloginfo.keywords if bloginfo else "web2py, Gluon, Python, Enterprise, Web, Framework, PyPress"
-response.description = bloginfo.description if bloginfo else "Just another PyPress weblog"
+response.name = bloginfo.name if bloginfo else "PyPress For GAE"
+response.title = bloginfo.title if bloginfo else "pp4gae - a web2py powered weblog based on GAE"
+response.keywords = bloginfo.keywords if bloginfo else "pypress4gae, pp4gae, GAE, web2py, Gluon, Python, Web, PyPress"
+response.description = bloginfo.description if bloginfo else "Just another pypress4gae weblog"
 
 # This dynamically adds the pages to the menu
 pages = db(db.posts.post_type == 'page').select(db.posts.ALL)
@@ -146,31 +146,8 @@ def edit():
         area = request.args[0]
     except:
         redirect(URL(r = request,f = 'index'))
-        
-    try:
-        id = request.args[1]
-    except:
-        pass
-        
-    if area == 'post':
-        this_item = db(db.posts.id == id).select()[0]
-        edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text', 'post_category'], labels = post_labels)
-        edit_title = "Edit Post"
-    
-        if edit_form.accepts(request.vars, session):
-            session.flash = "Post updated."
-            redirect(URL(r = request,f = 'post/%s' %id))
-
-    elif area == 'page':
-        this_item = db(db.posts.id == id).select()[0]
-        edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text'], labels = post_labels)
-        edit_title = "Edit Page"
-    
-        if edit_form.accepts(request.vars, session):
-            session.flash = "Page updated."
-            redirect(URL(r = request,f = 'page/%s' %id))
-            
-    elif area == 'bloginfo':
+                    
+    if area == 'bloginfo':
         this_item = db().select(db.blog_info.ALL)[0]
         edit_form = SQLFORM(db.blog_info, this_item, fields = ['name', 'title', 'description', 'keywords'], labels = blog_info_labels)
         edit_title = "Edit Blog Informations"
@@ -204,9 +181,33 @@ def edit():
                 response.flash = "Password updated"
         
         return dict(edit_form = edit_form, edit_title = edit_title, pwd_form = pwd_form, pwd_title = pwd_title)
-            
+    
     else:
-        redirect(URL(r = request,f = 'index'))
+        try:
+            id = request.args[1]
+        except:
+            redirect(URL(r = request,f = 'index'))
+            
+        if area == 'post':
+            this_item = db(db.posts.id == id).select()[0]
+            edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text', 'post_category'], labels = post_labels)
+            edit_title = "Edit Post"
+        
+            if edit_form.accepts(request.vars, session):
+                session.flash = "Post updated."
+                redirect(URL(r = request,f = 'post/%s' %id))
+    
+        elif area == 'page':
+            this_item = db(db.posts.id == id).select()[0]
+            edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text'], labels = post_labels)
+            edit_title = "Edit Page"
+        
+            if edit_form.accepts(request.vars, session):
+                session.flash = "Page updated."
+                redirect(URL(r = request,f = 'page/%s' %id))
+    
+        else:
+            redirect(URL(r = request,f = 'index'))
     
     return dict(edit_form = edit_form, edit_title = edit_title)
 

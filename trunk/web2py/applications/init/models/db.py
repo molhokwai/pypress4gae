@@ -93,10 +93,10 @@ def database_init():
         admin=db().select(db.users.ALL)[0]
 
         db.blog_info.insert(
-            name='[web2py] PyPress',
-            description='Just another PyPress weblog',
-            title='PyPress - a web2py powered weblog',
-            keywords='web2py, Gluon, Python, Enterprise, Web, Framework, PyPress')
+            name='PyPress For GAE',
+            description='Just another pypress4gae weblog',
+            title='pp4gae - a web2py powered weblog based on GAE',
+            keywords='pypress4gae, pp4gae, GAE, web2py, Gluon, Python, Web, PyPress')
 
         db.categories.insert(
             category_name='uncategorized')
@@ -107,13 +107,13 @@ def database_init():
 
         db.posts.insert(
             post_title='Hello world!', 
-            post_text='Welcome to PyPress. This is your first post. Edit or delete it, then start blogging!',
+            post_text='Welcome to PyPress For GAE. This is your first post. Edit or delete it, then start blogging!',
             post_type='post',
             post_author=admin.id,
             post_category=cats[0].id)
         db.posts.insert(
-            post_title='Welcome to PyPress', 
-            post_text='This is the Python version of WordPress. Enjoy.',
+            post_title='Welcome to PyPress For GAE', 
+            post_text='This is the Python version of WordPress, GAE based. Enjoy.',
             post_type='post',
             post_author=admin.id,
             post_category=cats[1].id)
@@ -137,6 +137,9 @@ def database_init():
             comment_author_email='zrx550@gmail.com',
             comment_text='This is a comment')
         
+        db.links.insert(
+            link_title='GAE',
+            link_url='http://www.appspot.com')
         db.links.insert(
             link_title='web2py',
             link_url='http://www.web2py.com')
