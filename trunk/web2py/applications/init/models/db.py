@@ -4,26 +4,28 @@ try:
 except:
     db=DAL("gae")
     session.connect(request,response,db=db )
-    
 
-from gluon.contrib.login_methods.gae_google_account import GaeGoogleAccount
-from gluon.tools import Auth
-auth=Auth(globals(), db)
-auth.settings.login_form=GaeGoogleAccount()
-auth.define_tables()
-
+import base64
 import datetime
+
 db.define_table('blog_info',
     Field('name', required=True),
     Field('title'),
     Field('description'),
     Field('keywords'))
 
+db.define_table('users',
+    Field('alias'),
+    Field('email', required=True),
+    Field('password','password', required=True),
+    Field('post_time','datetime', default=datetime.datetime.today()))
+
 db.define_table('posts',
     Field('post_title', required=True),
     Field('post_text', 'text'),
     Field('post_time', 'datetime', default=datetime.datetime.today()),
     Field('post_type', required=True),
+    Field('post_author', required=True),
     Field('post_category', required=True))
     
 
@@ -43,13 +45,22 @@ db.define_table('links',
     Field('link_url', required=True))
 
 db.posts.post_type.requires = IS_IN_SET(['post', 'page'])
+db.posts.post_author.requires = IS_IN_DB(db, 'user.id', 'user.alias')
 db.posts.post_category.requires = IS_IN_DB(db, 'categories.id', 'categories.category_name')
+
+user_labels = {
+    'alias':'Alias',
+    'email':'Email',
+    'password':'Password',
+    'post_time':'Post Date'
+}
 
 post_labels = {
     'post_title':'Title',
     'post_text':'Post',
     'post_time':'Post Date',
     'post_type':'Type',
+    'post_author':'Author',
     'post_category':'Category'
 }
 
@@ -71,11 +82,10 @@ cat_labels = {
 }
 
 def database_init():
-    """
-    """
-    #print db().select(db.blog_info.ALL)
     if not db().select(db.blog_info.ALL):
-        db.auth_user.insert(email='admin',password='123456')
+        db.users.insert(alias='admin',email='admin',password=base64.b64encode('admin'))
+        admin=db().select(db.users.ALL)[0]
+
         db.blog_info.insert(
                         name='[web2py] PyPress',
                         description='Just another PyPress weblog',
@@ -93,11 +103,13 @@ def database_init():
                         post_title='Hello world!', 
                         post_text='Welcome to PyPress. This is your first post. Edit or delete it, then start blogging!',
                         post_type='post',
+                        post_author=admin.id,
                         post_category=cats[0].id)
         db.posts.insert(
                         post_title='Welcome to PyPress', 
                         post_text='This is the Python version of WordPress. Enjoy.',
                         post_type='post',
+                        post_author=admin.id,
                         post_category=cats[1].id)
         
         posts=db().select(db.posts.ALL)
@@ -126,8 +138,8 @@ def database_init():
                         link_title='WordPressClone',
                         link_url='http://www.web2py.com/appliances/default/show/36')
         db.links.insert(
-                        link_title='zrx550.cn',
-                        link_url='http://zrx550.cn')
+                        link_title='pypress4gae',
+                        link_url='http://code.google.com/p/pypress4gae')
 
 
 database_init()

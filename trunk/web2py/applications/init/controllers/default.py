@@ -1,13 +1,8 @@
 #from gluon.fileutils import check_credentials
 #session.authorized=check_credentials(request)
 
-blog_info = db().select(db.blog_info.ALL)
-#print "!"
-#print blog_info
-bloginfo=blog_info[0]
-#print "?"
-#print bloginfo.name
-#print db().select(db.blog_info.ALL)
+bloginfo = db().select(db.blog_info.ALL)[0]
+
 response.name = bloginfo.name if bloginfo else "[web2py<sup style='font-size:0.5em;'>TM</sup>] PyPress"
 response.title = bloginfo.title if bloginfo else "PyPress - a web2py powered weblog"
 response.keywords = bloginfo.keywords if bloginfo else "web2py, Gluon, Python, Enterprise, Web, Framework, PyPress"
@@ -263,26 +258,31 @@ def manage():
     
     else:
         redirect(URL(r = request,f = 'index'))
-        
-def login():
 
-    try: vars = request.vars
-    except:vars = []
+def test():
+    user = db(db.users.email=='admin')(db.users.password==base64.b64encode('admin')).select()[0]
+    return dict(user=user)
     
-    if len(vars)>0:
-        #print vars.username+" "+vars.password
-        user = auth.login_bare(vars.username,vars.password)
-        #print user
-        #response.flash=str(user)
-        if user:
-            response.flash="login "+str(user)
+def login():
+    db.users.email.requires=IS_NOT_EMPTY()
+    form=SQLFORM(db.users, fields=['email','password'])
+    if form.accepts(request.vars, session):
+        users=db(db.users.email==form.vars.email)(db.users.password==base64.b64encode(form.vars.password)).select()
+        #print users
+        if len(users):
+            session.authorized=users[0].id
+            session.email=users[0].email
+            session.alias=users[0].alias
+            session.flash='user logged in'
+            redirect(URL(r=request,f='index'))
         else:
-            response.flash="login "+str(user)
-            return dict()
-    else:
-        return dict()
-
+            form.errors['password']='user not exists or invalid password'
+    return dict(form=form)
 
 def logout():
-    auth.logout()
+    session.authorized=None
+    session.email=None
+    session.alias=None
+    session.flash='user logged out'
+    redirect(URL(r=request,f='index'))
     
