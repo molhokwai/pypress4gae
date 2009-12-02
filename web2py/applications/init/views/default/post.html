@@ -1,29 +1,13 @@
 {{extend 'layout.html'}}
 
-{{
-def get_post_cats(post_id):
-	cats=db().select(db.categories.ALL)
-	items=[]
-	for cat in cats:
-		item="<a href='/%(app)s/default/category/%(cat)s'>%(name)s</a>" % {'app':request.application, 'cat':cat.category_name, 'name':cat.category_name}
-		items.append(item)
-	pass
-	cat_list=", ".join(items)
-	return XML(cat_list)
-}}
-
 <div class="post">
 	<h2>{{=post.post_title}}</h2>
-
 	<div class="entry">
 		<p>{{=post.post_text}}</p>
-						
 		<p class="postmetadata alt" style="text-align: justify;">
 			<small>
-				This entry was posted on {{=post.post_time.strftime("%A, %B %d, %Y at %I:%M %p")}}
-				and is filed under {{=get_post_cats(post.id)}}.
-				You can follow any responses to this entry by reading the comments. You can leave a response by posting a comment. 
-				{{if session.authorized:}}<a href="/{{=request.application}}/default/edit/page/{{=post.id}}">Edit this entry.</a>{{pass}}
+				Under: {{=get_post_cats(post.id)}} By: {{=get_post_author(post.post_author)}} / {{=post.post_time.strftime("%Y.%m.%d / %H:%M")}} 
+				{{if session.authorized:}}<a href="/{{=request.application}}/default/edit/page/{{=post.id}}">Edit</a>{{pass}}
 			</small>
 		</p>
 	</div>
