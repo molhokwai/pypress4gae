@@ -139,10 +139,14 @@ def edit():
 
     try:
         area = request.args[0]
-        id = request.args[1]
     except:
         redirect(URL(r = request,f = 'index'))
-    
+        
+    try:
+        id = request.args[1]
+    except:
+        pass
+        
     if area == 'post':
         this_item = db(db.posts.id == id).select()[0]
         edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text', 'post_category'], labels = post_labels)
@@ -160,7 +164,25 @@ def edit():
         if edit_form.accepts(request.vars, session):
             session.flash = "Page updated."
             redirect(URL(r = request,f = 'page/%s' %id))
-                    
+            
+    elif area == 'bloginfo':
+        this_item = db().select(db.blog_info.ALL)[0]
+        edit_form = SQLFORM(db.blog_info, this_item, fields = ['name', 'title', 'description', 'keywords'], labels = blog_info_labels)
+        edit_title = "Edit Blog Informations"
+        
+        if edit_form.accepts(request.vars, session):
+            session.flash = "Blog information updated."
+            redirect(URL(r = request,f = 'index'))
+    
+    elif area == 'userinfo':
+        this_item = db(db.users.id == session.authorized).select(db.users.ALL)[0]
+        edit_form = SQLFORM(db.users, this_item, fields = ['alias','email','password'], labels = user_labels)
+        edit_title = "Edit User Informatioins"
+        
+        if edit_form.accepts(request.vars, session):
+            edit_form.vars.password = base64.b64encode(edit_form.vars.password)
+            session.flash = "User Information updated."
+            redirect(URL(r = request, f = 'index'))
     else:
         redirect(URL(r = request,f = 'index'))
     
