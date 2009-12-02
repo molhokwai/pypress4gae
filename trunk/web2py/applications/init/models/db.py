@@ -106,6 +106,11 @@ def database_init():
         cats=db().select(db.categories.ALL)
 
         db.posts.insert(
+            post_title='About',
+            post_text='This is an example of a pypress4gae page. You could edit this to put information about yourself or your site so readers know where you are coming from. You can create as many pages like this one and manage all of your content inside of pypress4gae.',
+            post_type='page',
+            post_author=admin.id)
+        db.posts.insert(
             post_title='Hello world!', 
             post_text='Welcome to PyPress For GAE. This is your first post. Edit or delete it, then start blogging!',
             post_type='post',

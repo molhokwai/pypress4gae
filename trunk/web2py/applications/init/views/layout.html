@@ -70,7 +70,14 @@
 					
 					{{if response.menu:}}
 						<li>
-		                	<h2 class="widgettitle">Pages</h2>
+		                	<h2 class="widgettitle">
+		                	    Pages
+		                	    {{if session.authorized:}}
+                                    <span style="font-size: .8em; font-weight: normal;">
+                                        [<a href="/{{=request.application}}/default/manage/page">manage</a>]
+                                    </span>
+                                {{pass}}
+		                	</h2>
 		                	<ul>
 		                    	{{for _name,_active,_link in response.menu:}}
 		                            <li><a href="{{=_link}}" {{if not _active:}}class="inactive"{{pass}}>{{=_name}}</a></li>
@@ -78,7 +85,23 @@
 		                    </ul>
 						</li>
 					{{pass}}
-					
+					{{if response.last_posts:}}
+					   <li>
+                            <h2 class="widgettitle">
+                                Posts
+                                {{if session.authorized:}}
+                                    <span style="font-size: .8em; font-weight: normal;">
+                                        [<a href="/{{=request.application}}/default/manage/post">manage</a>]
+                                    </span>
+                                {{pass}}
+                            </h2>
+                            <ul>
+                                {{for _name,_date,_link in response.last_posts:}}
+                                    <li><a href="{{=_link}}">{{=_name}}</a>&nbsp;{{=_date.strftime("%Y.%m.%d")}}</li>
+                                {{pass}}
+                            </ul>
+                        </li>
+                    {{pass}}
 					{{if response.categories:}}
 						<li>
 		                	<h2 class="widgettitle">
@@ -87,7 +110,7 @@
 									<span style="font-size: .8em; font-weight: normal;">
 										[<a href="/{{=request.application}}/default/manage/category">manage</a>]
 									</span>
-								{{pass}}					
+								{{pass}}
 							</h2>
 		                	<ul>
 		                    	{{for _name,_count,_link in response.categories:}}
@@ -96,7 +119,7 @@
 		                    </ul>					
 						</li>
 					{{pass}}
-					
+                    					
 					{{if response.links:}}
 						<li>
 		                	<h2 class="widgettitle">
