@@ -37,6 +37,15 @@ for link in links:
     items.append(item)
 response.links = items
 
+# This returns latest 5 posts
+last_posts = db(db.posts.post_type == 'post').select(db.posts.ALL, orderby=~db.posts.post_time|~db.posts.post_title, limitby=(0,5))
+items = []
+for post in last_posts:
+    item = [post.post_title, post.post_time, '/%(app)s/default/post/%(id)s' % {'app':request.application, 'id':post.id}]
+    items.append(item)
+response.last_posts = items
+
+
 # The main page
 # Shows the first 10 posts    
 def index():
@@ -300,7 +309,99 @@ def manage():
         else:
             edit_form = ''
             
-        return dict(rows = rows, manage_title = manage_title, edit_form = edit_form, area = area)        
+        return dict(rows = rows, manage_title = manage_title, edit_form = edit_form, area = area)
+    
+    elif area == 'post':
+        rows = db(db.posts.post_type == 'post').select(db.posts.ALL)
+        manage_title = 'Manage Posts'
+       
+        if command == 'add':
+            redirect(URL(r = request, f = 'add/post'))
+            """
+            edit_form = SQLFORM(db.posts, labels = post_labels)
+            
+            if edit_form.accepts(request.vars, session):
+                session.flash = "Post added"
+                redirect(URL(r = request, f = 'manage/post'))
+            else:
+                session.flash = "Error"
+            """
+        elif command == 'edit':
+            try: id = request.args[2]
+            except: id = ""
+            
+            if id != '':
+                redirect(URL(r = request, f = 'edit/post/'+id))
+                """
+                this_post = db(db.posts.id == id).select()[0]
+                edit_form = SQLFORM(db.posts, this_post)
+                
+                if edit_form.accepts(request.vars, session):
+                    session.flash = "Post updated"
+                    redirect(URL(r = request, f = 'manage/post'))
+                else:
+                    session.flash = "Error"
+                """
+        elif command == 'delete':
+            try: id = request.args[2]
+            except: id = ""
+            
+            if id != '':
+                db(db.posts.id == id).delete()
+                session.flash = "Post deleted"
+                redirect(URL(r = request, f = 'manage/post'))
+        
+        else:
+            edit_form = ''
+            
+        return dict(rows = rows, manage_title = manage_title, edit_form = edit_form, area = area)
+        
+    elif area == 'page':
+        rows = db(db.posts.post_type == 'page').select(db.posts.ALL)
+        manage_title = 'Manage Pages'
+       
+        if command == 'add':
+            redirect(URL(r = request, f = 'add/page'))
+            """
+            edit_form = SQLFORM(db.posts, labels = post_labels)
+            
+            if edit_form.accepts(request.vars, session):
+                session.flash = "Page added"
+                redirect(URL(r = request, f = 'manage/page'))
+            else:
+                session.flash = "Error"
+            """
+        
+        elif command == 'edit':
+            try: id = request.args[2]
+            except: id = ""
+            
+            if id != '':
+                redirect(URL(r = request, f = 'edit/page/'+id))
+                """
+                this_post = db(db.posts.id == id).select()[0]
+                edit_form = SQLFORM(db.posts, this_post)
+                
+                if edit_form.accepts(request.vars, session):
+                    session.flash = "Page updated"
+                    redirect(URL(r = request, f = 'manage/page'))
+                else:
+                    session.flash = "Error"
+                """
+        
+        elif command == 'delete':
+            try: id = request.args[2]
+            except: id = ""
+            
+            if id != '':
+                db(db.posts.id == id).delete()
+                session.flash = "Page deleted"
+                redirect(URL(r = request, f = 'manage/page'))
+        
+        else:
+            edit_form = ''
+            
+        return dict(rows = rows, manage_title = manage_title, edit_form = edit_form, area = area)
     
     else:
         redirect(URL(r = request,f = 'index'))
