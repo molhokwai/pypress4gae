@@ -1,6 +1,5 @@
  
 def get_post_author(author_id):
-    #print author_id
     user = db(db.users.id==author_id).select()[0]
     return XML(db(db.users.id == author_id).select()[0].alias)
 
@@ -27,4 +26,5 @@ def get_post_cats(post_id):
     cat_list=", ".join(items)
     return XML(cat_list)
 
- 
+# for the customized password update form
+def form_factory(*a): return SQLFORM(SQLDB(None).define_table(*a))

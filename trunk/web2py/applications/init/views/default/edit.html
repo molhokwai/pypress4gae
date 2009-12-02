@@ -27,4 +27,11 @@
 	<div class="entry">
 		<p>{{=edit_form}}</p>
 	</div>
+	{{if 'pwd_title' in globals():}}
+	    <h2>{{=pwd_title}}</h2>
+	
+	    <div class="entry">
+	        <p>{{=pwd_form}}</p>
+	    </div>
+	{{pass}}
 </div>

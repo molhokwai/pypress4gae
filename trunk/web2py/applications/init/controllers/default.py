@@ -3,7 +3,7 @@
 
 bloginfo = db().select(db.blog_info.ALL)[0]
 
-response.name = bloginfo.name if bloginfo else "[web2py<sup style='font-size:0.5em;'>TM</sup>] PyPress"
+response.name = bloginfo.name if bloginfo else "[web2py] PyPress"
 response.title = bloginfo.title if bloginfo else "PyPress - a web2py powered weblog"
 response.keywords = bloginfo.keywords if bloginfo else "web2py, Gluon, Python, Enterprise, Web, Framework, PyPress"
 response.description = bloginfo.description if bloginfo else "Just another PyPress weblog"
@@ -89,6 +89,9 @@ def category():
         redirect(URL(r = request,f = 'index'))
 
 def add():
+    if not session.authorized:
+        redirect(URL(r=request,f='index'))
+        
     try:
         area = request.args[0]
 
@@ -136,7 +139,9 @@ def add():
         redirect(URL(r = request,f = 'index'))
 
 def edit():
-
+    if not session.authorized:
+        redirect(URL(r=request,f='index'))
+        
     try:
         area = request.args[0]
     except:
@@ -176,21 +181,39 @@ def edit():
     
     elif area == 'userinfo':
         this_item = db(db.users.id == session.authorized).select(db.users.ALL)[0]
-        edit_form = SQLFORM(db.users, this_item, fields = ['alias','email','password'], labels = user_labels)
+        edit_form = SQLFORM(db.users, this_item, fields = ['alias','email'], labels = user_labels)
         edit_title = "Edit User Informatioins"
-        
         if edit_form.accepts(request.vars, session):
-            edit_form.vars.password = base64.b64encode(edit_form.vars.password)
             session.flash = "User Information updated."
             redirect(URL(r = request, f = 'index'))
+            
+        # an hack to make password update a separated part
+        pwd_form = form_factory('myform',
+                SQLField('old_password','password',requires=IS_NOT_EMPTY()),
+                SQLField('new_password','password',requires=IS_NOT_EMPTY()),
+                SQLField('new_password_again','password',
+                         requires=IS_EXPR("value=='%s'"%request.vars.new_password,
+                                              error_message = "passwords do not match")))
+        pwd_title = "Update User Password"
+        if pwd_form.accepts(request.vars,session):
+            user=db(db.users.id == session.authorized).select()[0]
+            if user.password != base64.b64encode(pwd_form.vars.old_password):
+                response.flash = "invalid old password"
+            else:
+                user.update_record(password=base64.b64encode(pwd_form.vars.new_password))
+                response.flash = "Password updated"
+        
+        return dict(edit_form = edit_form, edit_title = edit_title, pwd_form = pwd_form, pwd_title = pwd_title)
+            
     else:
         redirect(URL(r = request,f = 'index'))
     
     return dict(edit_form = edit_form, edit_title = edit_title)
 
-        
 def manage():
-
+    if not session.authorized:
+        redirect(URL(r=request,f='index'))
+        
     area = request.args[0]
     
     try: command = request.args[1]
@@ -280,10 +303,6 @@ def manage():
     
     else:
         redirect(URL(r = request,f = 'index'))
-
-def test():
-    user = db(db.users.email=='admin')(db.users.password==base64.b64encode('admin')).select()[0]
-    return dict(user=user)
     
 def login():
     db.users.email.requires=IS_NOT_EMPTY()
