@@ -27,4 +27,5 @@ def get_post_cats(post_id):
     return XML(cat_list)
 
 # for the customized password update form
-def form_factory(*a): return SQLFORM(SQLDB(None).define_table(*a))
+from gluon.contrib.gql import GQLDB
+def form_factory(*a): return SQLFORM(GQLDB().define_table(*a))

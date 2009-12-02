@@ -133,7 +133,7 @@ def database_init():
         db.comments.insert(
             post_id=posts[1].id,
             comment_author='Richard',
-            comment_author_web='http://www.google.com',
+            comment_author_website='http://www.google.com',
             comment_author_email='zrx550@gmail.com',
             comment_text='This is a comment')
         
