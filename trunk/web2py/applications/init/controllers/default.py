@@ -226,8 +226,8 @@ def edit():
 def manage():
     if not session.authorized:
         redirect(URL(r=request,f='index'))
-        
-    area = request.args[0]
+    try: area = request.args[0]
+    except: redirect(URL(r = request,f = 'index'))
     
     try: command = request.args[1]
     except: command = ""
