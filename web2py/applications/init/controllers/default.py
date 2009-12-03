@@ -58,15 +58,18 @@ def index():
 def post():
     #try: 
     post_id = int(request.args[0])
-    post = db(db.posts.id == post_id).select()[0]
+    posts = db(db.posts.id == post_id).select()
+    if not posts:
+        redirect(URL(r = request,f = 'index'))
+    post = posts[0]
     comments = db(db.comments.post_id == post_id).select(db.comments.ALL)
     comment_count = len(db(db.comments.post_id == post_id).select(db.comments.ALL))
     db.comments.post_id.default = post_id
+
     comment_form = SQLFORM(db.comments, fields = ['comment_author', 'comment_author_email', 'comment_author_website', 'comment_text'], labels = comment_labels)
-        
     if comment_form.accepts(request.vars, session):
         session.flash = "Comment added."
-        redirect(URL(r = request,f = 'index'))
+        redirect(URL(r = request,f = 'post/%d' % post_id))
         
     return dict(post = post, comments = comments, comment_form = comment_form, comment_count = comment_count)
     #except: 
@@ -106,6 +109,7 @@ def add():
 
         if area == "post":
             db.posts.post_type.default = 'post'
+            db.posts.post_author.default = session.authorized
             page_form = SQLFORM(db.posts, fields = ['post_title', 'post_text', 'post_category'], labels = post_labels)
             page_title = "Add Post"
             
@@ -115,6 +119,7 @@ def add():
         
         elif area == "page":
             db.posts.post_type.default = 'page'
+            db.posts.post_author.default = session.authorized
             page_form = SQLFORM(db.posts, fields = ['post_title', 'post_text'], labels = post_labels)
             page_title = "Add Page"
             
@@ -123,7 +128,6 @@ def add():
                 redirect(URL(r = request,f = 'index'))
                
         elif area == "category":
-            db.posts.post_type.default = 'category'
             page_form = SQLFORM(db.categories, fields = ['category_name'], labels = post_labels)
             page_title = "Add Category"
             
@@ -132,7 +136,6 @@ def add():
                 redirect(URL(r = request,f = 'index'))
                 
         elif area == "link":
-            db.posts.post_type.default = 'link'
             page_form = SQLFORM(db.links, fields = ['link_title','link_url'], labels = post_labels)
             page_title = "Add Linnk"
             
@@ -158,7 +161,7 @@ def edit():
                     
     if area == 'bloginfo':
         this_item = db().select(db.blog_info.ALL)[0]
-        edit_form = SQLFORM(db.blog_info, this_item, fields = ['name', 'title', 'description', 'keywords'], labels = blog_info_labels)
+        edit_form = SQLFORM(db.blog_info, this_item, fields = ['name', 'title', 'description', 'keywords'], showid=False, labels = blog_info_labels)
         edit_title = "Edit Blog Informations"
         
         if edit_form.accepts(request.vars, session):
@@ -167,7 +170,7 @@ def edit():
     
     elif area == 'userinfo':
         this_item = db(db.users.id == session.authorized).select(db.users.ALL)[0]
-        edit_form = SQLFORM(db.users, this_item, fields = ['alias','email'], labels = user_labels)
+        edit_form = SQLFORM(db.users, this_item, fields = ['alias','email'], showid=False, labels = user_labels)
         edit_title = "Edit User Informatioins"
         if edit_form.accepts(request.vars, session):
             session.flash = "User Information updated."
@@ -179,12 +182,12 @@ def edit():
                 SQLField('new_password','password',requires=IS_NOT_EMPTY()),
                 SQLField('new_password_again','password',
                          requires=IS_EXPR("value=='%s'"%request.vars.new_password,
-                                              error_message = "passwords do not match")))
+                                              error_message = "Passwords do not match")))
         pwd_title = "Update User Password"
         if pwd_form.accepts(request.vars,session):
             user=db(db.users.id == session.authorized).select()[0]
             if user.password != hashlib.sha1(pwd_form.vars.old_password).hexdigest():
-                response.flash = "invalid old password"
+                response.flash = "Invalid old password"
             else:
                 user.update_record(password=hashlib.sha1(pwd_form.vars.new_password).hexdigest())
                 response.flash = "Password updated"
@@ -199,7 +202,7 @@ def edit():
             
         if area == 'post':
             this_item = db(db.posts.id == id).select()[0]
-            edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text', 'post_category'], labels = post_labels)
+            edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text', 'post_category'], showid=False, labels = post_labels)
             edit_title = "Edit Post"
         
             if edit_form.accepts(request.vars, session):
@@ -208,7 +211,7 @@ def edit():
     
         elif area == 'page':
             this_item = db(db.posts.id == id).select()[0]
-            edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text'], labels = post_labels)
+            edit_form = SQLFORM(db.posts, this_item, fields = ['post_title', 'post_text'], showid=False, labels = post_labels)
             edit_title = "Edit Page"
         
             if edit_form.accepts(request.vars, session):
@@ -248,7 +251,7 @@ def manage():
             
             if id != '':
                 this_link = db(db.links.id == id).select()[0]
-                edit_form = SQLFORM(db.links, this_link)
+                edit_form = SQLFORM(db.links, this_link, showid=False)
                 
                 if edit_form.accepts(request.vars, session):
                     session.flash = "Link updated"
@@ -289,7 +292,7 @@ def manage():
             
             if id != '':
                 this_cat = db(db.categories.id == id).select()[0]
-                edit_form = SQLFORM(db.categories, this_cat)
+                edit_form = SQLFORM(db.categories, this_cat, showid=False)
                 
                 if edit_form.accepts(request.vars, session):
                     session.flash = "Category updated"
@@ -317,31 +320,14 @@ def manage():
        
         if command == 'add':
             redirect(URL(r = request, f = 'add/post'))
-            """
-            edit_form = SQLFORM(db.posts, labels = post_labels)
             
-            if edit_form.accepts(request.vars, session):
-                session.flash = "Post added"
-                redirect(URL(r = request, f = 'manage/post'))
-            else:
-                session.flash = "Error"
-            """
         elif command == 'edit':
             try: id = request.args[2]
             except: id = ""
             
             if id != '':
                 redirect(URL(r = request, f = 'edit/post/'+id))
-                """
-                this_post = db(db.posts.id == id).select()[0]
-                edit_form = SQLFORM(db.posts, this_post)
                 
-                if edit_form.accepts(request.vars, session):
-                    session.flash = "Post updated"
-                    redirect(URL(r = request, f = 'manage/post'))
-                else:
-                    session.flash = "Error"
-                """
         elif command == 'delete':
             try: id = request.args[2]
             except: id = ""
@@ -350,11 +336,24 @@ def manage():
                 db(db.posts.id == id).delete()
                 session.flash = "Post deleted"
                 redirect(URL(r = request, f = 'manage/post'))
-        
         else:
             edit_form = ''
             
         return dict(rows = rows, manage_title = manage_title, edit_form = edit_form, area = area)
+                
+    elif area == 'comment':
+        rows = db(db.posts.post_type == 'post').select(db.posts.ALL)
+        manage_title = 'Manage Posts'
+       
+        if command == 'delete':
+            try: id = request.args[2]
+            except:
+                redirect(URL(r = request, f = 'index'))
+            comment = db(db.comments.id == id).select()[0]
+            post_id = comment.post_id;
+            db(db.comments.id == id).delete()
+            session.flash = "Post deleted"
+            redirect(URL(r = request, f = 'post/%d' % post_id))
         
     elif area == 'page':
         rows = db(db.posts.post_type == 'page').select(db.posts.ALL)
@@ -362,15 +361,6 @@ def manage():
        
         if command == 'add':
             redirect(URL(r = request, f = 'add/page'))
-            """
-            edit_form = SQLFORM(db.posts, labels = post_labels)
-            
-            if edit_form.accepts(request.vars, session):
-                session.flash = "Page added"
-                redirect(URL(r = request, f = 'manage/page'))
-            else:
-                session.flash = "Error"
-            """
         
         elif command == 'edit':
             try: id = request.args[2]
@@ -378,16 +368,6 @@ def manage():
             
             if id != '':
                 redirect(URL(r = request, f = 'edit/page/'+id))
-                """
-                this_post = db(db.posts.id == id).select()[0]
-                edit_form = SQLFORM(db.posts, this_post)
-                
-                if edit_form.accepts(request.vars, session):
-                    session.flash = "Page updated"
-                    redirect(URL(r = request, f = 'manage/page'))
-                else:
-                    session.flash = "Error"
-                """
         
         elif command == 'delete':
             try: id = request.args[2]
@@ -416,16 +396,16 @@ def login():
             session.authorized=users[0].id
             session.email=users[0].email
             session.alias=users[0].alias
-            session.flash='user logged in'
+            session.flash='User logged in'
             redirect(URL(r=request,f='index'))
         else:
-            form.errors['password']='user not exists or invalid password'
+            form.errors['password']='User not exists or invalid password'
     return dict(form=form)
 
 def logout():
     session.authorized=None
     session.email=None
     session.alias=None
-    session.flash='user logged out'
+    session.flash='User logged out'
     redirect(URL(r=request,f='index'))
     

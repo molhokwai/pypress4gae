@@ -31,13 +31,15 @@
 		<li {{if count % 2 == 0:}}class="alt"{{pass}}>
 			<cite>
 				{{if comment.comment_author_website:}}
-					<a target="_blank" href='{{=comment.comment_author_website}}'>{{=comment.comment_author}}</a>
+					<a target="_blank" href='{{=url_text(comment.comment_author_website)}}'>{{=comment.comment_author}}</a>
 				{{else:}}
 					{{=comment.comment_author}}
 				{{pass}}
 			</cite> Says:<br />
-			<small class="commentmetadata">{{=comment.comment_time.strftime("%B %d, %Y at %I:%M %p")}}</small>
-			<p>{{=comment.comment_text}}</p>
+			<small class="commentmetadata">{{=comment.comment_time.strftime("%B %d, %Y at %I:%M %p")}}
+			{{if session.authorized:}}<a href="/{{=request.application}}/default/manage/comment/delete/{{=comment.id}}">Delete</a>{{pass}}
+			</small>
+			<p>{{=hyper_text(comment.comment_text)}}</p>
 		</li>
 		{{count = count + 1}}
 	{{pass}}

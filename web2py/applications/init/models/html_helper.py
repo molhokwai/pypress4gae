@@ -35,3 +35,9 @@ def form_factory(*a): return SQLFORM(GQLDB().define_table(*a))
 def hyper_text(text):
     hyper = re.sub('\n','<br/>',text)
     return XML(hyper)
+
+def url_text(text):
+    if re.match(r'^[(http://)|(ftp://)|(https://)].+', text):
+        return text
+    else:
+        return 'http://'+text
