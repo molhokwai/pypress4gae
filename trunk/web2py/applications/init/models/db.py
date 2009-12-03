@@ -5,7 +5,7 @@ except:
     db=DAL("gae")
     session.connect(request,response,db=db )
 
-import base64
+import hashlib
 import datetime
 
 db.define_table('blog_info',
@@ -89,7 +89,7 @@ cat_labels = {
 
 def database_init():
     if not db().select(db.blog_info.ALL):
-        db.users.insert(alias='admin',email='admin',password=base64.b64encode('admin'))
+        db.users.insert(alias='admin',email='admin',password=hashlib.sha1('admin').hexdigest())
         admin=db().select(db.users.ALL)[0]
 
         db.blog_info.insert(
