@@ -1,4 +1,6 @@
- 
+import re
+from gluon.contrib.gql import GQLDB
+
 def get_post_author(author_id):
     user = db(db.users.id==author_id).select()[0]
     return XML(db(db.users.id == author_id).select()[0].alias)
@@ -27,5 +29,9 @@ def get_post_cats(post_id):
     return XML(cat_list)
 
 # for the customized password update form
-from gluon.contrib.gql import GQLDB
 def form_factory(*a): return SQLFORM(GQLDB().define_table(*a))
+
+
+def hyper_text(text):
+    hyper = re.sub('\n','<br/>',text)
+    return XML(hyper)
