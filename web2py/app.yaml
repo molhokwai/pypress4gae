@@ -10,6 +10,10 @@ handlers:
   upload: applications/(.+?)/static/(.+)
   secure: optional
 
+- url: /favicon.ico
+  static_files: favicon.ico
+  upload: favicon.ico
+
 - url: /admin-gae/.*
   script: $PYTHON_LIB/google/appengine/ext/admin
   login: admin

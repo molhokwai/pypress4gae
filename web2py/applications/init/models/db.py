@@ -89,9 +89,22 @@ cat_labels = {
 
 def database_init():
     if not db().select(db.blog_info.ALL):
+        """"      
+        #for delete originally exists tables, seems not working on GAE, cause in gql.py it only did the truncate operation
+        db.define_table('test',Field('test', required=True))
+        
+        initial_tables = ['web2py_session_init','blog_info','users','posts','comments','categories','links']
+        tables = db.tables
+        for table in tables:
+            print table
+            if table not in initial_tables:
+                #print db[table].fields
+                db[table].drop()
+        """
+        
         db.users.insert(alias='admin',email='admin',password=hashlib.sha1('admin').hexdigest())
         admin=db().select(db.users.ALL)[0]
-
+        
         db.blog_info.insert(
             name='PyPress For GAE',
             description='Just another pypress4gae weblog',
