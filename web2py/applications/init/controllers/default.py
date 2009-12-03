@@ -183,10 +183,10 @@ def edit():
         pwd_title = "Update User Password"
         if pwd_form.accepts(request.vars,session):
             user=db(db.users.id == session.authorized).select()[0]
-            if user.password != base64.b64encode(pwd_form.vars.old_password):
+            if user.password != hashlib.sha1(pwd_form.vars.old_password).hexdigest():
                 response.flash = "invalid old password"
             else:
-                user.update_record(password=base64.b64encode(pwd_form.vars.new_password))
+                user.update_record(password=hashlib.sha1(pwd_form.vars.new_password).hexdigest())
                 response.flash = "Password updated"
         
         return dict(edit_form = edit_form, edit_title = edit_title, pwd_form = pwd_form, pwd_title = pwd_title)
@@ -410,7 +410,7 @@ def login():
     db.users.email.requires=IS_NOT_EMPTY()
     form=SQLFORM(db.users, fields=['email','password'])
     if form.accepts(request.vars, session):
-        users=db(db.users.email==form.vars.email)(db.users.password==base64.b64encode(form.vars.password)).select()
+        users=db(db.users.email==form.vars.email)(db.users.password==hashlib.sha1(form.vars.password).hexdigest()).select()
         #print users
         if len(users):
             session.authorized=users[0].id
