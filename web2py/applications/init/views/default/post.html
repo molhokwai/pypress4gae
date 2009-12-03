@@ -3,7 +3,7 @@
 <div class="post">
 	<h2>{{=post.post_title}}</h2>
 	<div class="entry">
-		<p>{{=post.post_text}}</p>
+		<p>{{=hyper_text(post.post_text)}}</p>
 		<p class="postmetadata alt" style="text-align: justify;">
 			<small>
 				Under: {{=get_post_cats(post.id)}} By: {{=get_post_author(post.post_author)}} / {{=post.post_time.strftime("%Y.%m.%d / %H:%M")}} 
